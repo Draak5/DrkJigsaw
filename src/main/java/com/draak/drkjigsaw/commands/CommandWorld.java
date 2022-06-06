@@ -3,10 +3,7 @@ package com.draak.drkjigsaw.commands;
 import com.draak.drkjigsaw.Main;
 import com.draak.drkjigsaw.player.PlayerWrapper;
 import com.draak.drkjigsaw.worlds.EmptyChunkGenerator;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,6 +25,11 @@ public class CommandWorld implements CommandExecutor {
                 WorldCreator wc = new WorldCreator("plot_"+args[1].toLowerCase());
                 wc.generator(new EmptyChunkGenerator());
                 World world = wc.createWorld();
+                world.setPVP(true);
+                world.setDifficulty(Difficulty.NORMAL);
+                world.setSpawnFlags(false, false);
+                world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+
 
                 int plotSize = 128;
 
