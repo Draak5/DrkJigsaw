@@ -1,0 +1,15 @@
+name: DrkJigsaw
+version: '${project.version}'
+main: com.draak.drkjigsaw.Main
+api-version: 1.18
+authors: [ Draak_5 ]
+
+commands:
+  mode:
+    description: Change Mode
+  world:
+    description: worlds
+  spawn:
+    description: go to spawn
+  fs:
+    description: change flight speed
