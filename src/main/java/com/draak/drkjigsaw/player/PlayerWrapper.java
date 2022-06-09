@@ -1,5 +1,6 @@
 package com.draak.drkjigsaw.player;
 
+import com.draak.drkjigsaw.ItemTagHandler;
 import com.draak.drkjigsaw.Main;
 import com.draak.drkjigsaw.codeblocks.CodeBlocks;
 import org.bukkit.GameMode;
@@ -14,16 +15,33 @@ import java.util.Collections;
 
 public class PlayerWrapper {
 
+
+
+
     public enum PlayerMode { Play, Edit }
     private boolean inSpawn = true;
     private int isOnPlotID = 0;
     private Player player;
     private PlayerMode playerMode;
 
+    PlayerSaveData saveData;
+
 
     public PlayerWrapper(Player player) {
         this.player = player;
+        loadPlayerSaveData();
         sendToSpawn();
+    }
+
+    public void loadPlayerSaveData() {
+        saveData = new PlayerSaveData();
+        saveData.addPlot(PlayerSaveData.PlotSize.Small, 2);
+        saveData.addPlot(PlayerSaveData.PlotSize.Large, 1);
+        saveData.addPlot(PlayerSaveData.PlotSize.Massive, 0);
+        saveData.addPlot(PlayerSaveData.PlotSize.Huge, 0);
+    }
+    public PlayerSaveData getSaveData() {
+        return saveData;
     }
 
 
@@ -41,6 +59,7 @@ public class PlayerWrapper {
         meta.setDisplayName("§f§nYour Plots");
         meta.setLore(Collections.singletonList("§7Click to view your plots"));
         item.setItemMeta(meta);
+        ItemTagHandler.addCustomTag(item, "spawnyourplots", 1);
         player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, item);
     }
@@ -72,8 +91,19 @@ public class PlayerWrapper {
     public PlayerMode getMode() {
         return playerMode;
     }
-
+    public boolean isInSpawn() {
+        return inSpawn;
+    }
     public void sendError(String s) {
         player.sendMessage("§4[♂] §c"+s);
+    }
+
+    public void generatePlot(PlayerSaveData.PlotSize plotSize) {
+        if (saveData.giveEmptyPlotToPlayer(plotSize)) {
+            player.sendMessage("§2Plot successfully created!");
+            player.closeInventory();
+        } else {
+            player.sendMessage("§cYou don't own any more "+plotSize.toString()+" plots!");
+        }
     }
 }

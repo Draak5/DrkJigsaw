@@ -7,43 +7,84 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.FileUtil;
 
+import java.io.File;
+import java.nio.file.SecureDirectoryStream;
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class WorldHandler {
 
 
-    ArrayList<String> unloadedWorlds = new ArrayList<>();
+    // Worlds ready for players to join
+    ArrayList<String> bufferedWorlds = new ArrayList<>();
+    // Worlds players are in
     ArrayList<String> loadedWorlds = new ArrayList<>();
-    ArrayList<String> worlds = new ArrayList<>();
+    // Worlds which are not loaded
+    ArrayList<String> availableWorlds = new ArrayList<>();
 
 
 
-    public static void initialize() {
+
+
+    public WorldHandler() {
         Main.logInfo("Initialize World Handler");
-        FileConfiguration config = Main.getInstance().getConfig();
-        /*
-        if (config.getConfigurationSection("worlds") != null) {
-            for (String world : config.getConfigurationSection("worlds").getKeys(false)) {
-                Main.getInstance().getLogger().info("Preparing world '" + world+"'");
-                World w = new WorldCreator(world).type(WorldType.FLAT).environment(World.Environment.CUSTOM).generateStructures(false).createWorld();
-                w.setPVP(true);
-                w.setDifficulty(Difficulty.NORMAL);
-                w.setSpawnFlags(false, false);
+
+        for (File file : Objects.requireNonNull(Main.getInstance().getServer().getWorldContainer().listFiles())) {
+            if (file.isDirectory()) {
+                if (!file.getName().equals("spawn")) {
+                    if (deleteWorld(file)) {
+                        Main.logInfo("Deleted " + file.getName());
+                    } else {
+                        Main.getInstance().getLogger().warning("Failed to delete " + file.getName());
+                    }
+                }
             }
-        }*/
+        }
+
+        //
+        updateBufferedWorlds();
     }
-    public static void unloadWorld(String world) {
+
+    public boolean deleteWorld(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            assert files != null;
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteWorld(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        return (path.delete());
+    }
+    public void updateBufferedWorlds() {
+        int targetBufferAmount = Main.getInstance().getServer().getOnlinePlayers().size();
+        targetBufferAmount -= loadedWorlds.size();
+        if (targetBufferAmount > 5) targetBufferAmount = 5;
+
+        Main.logInfo("Target Buffer Count: " + targetBufferAmount);
+
+        if (bufferedWorlds.size() < targetBufferAmount) {
+            bufferedWorlds.add("w" + (bufferedWorlds.size() + loadedWorlds.size()));
+        } else {
+            deleteWorld(Main.getInstance().getServer().getWorld(bufferedWorlds.get(bufferedWorlds.size()-1)).getWorldFolder());
+        }
+    }
+    public void unloadWorld(String world) {
 
     }
-    public static void loadWorld() {
+    public void loadWorld() {
 
     }
-    public static void createNewPlotWorld() {
+    public void loadPlotOntoWorld() {
 
     }
-    public static void teleportToWorld(Player plr, String worldName) {
+    public void teleportToWorld(Player plr, String worldName) {
 
     }
 

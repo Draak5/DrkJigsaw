@@ -1,15 +1,9 @@
 package com.draak.drkjigsaw;
 
 import com.draak.drkjigsaw.codeblocks.CodeBlocks;
-import com.draak.drkjigsaw.commands.CommandFs;
 import com.draak.drkjigsaw.commands.CommandHandler;
-import com.draak.drkjigsaw.commands.CommandMode;
-import com.draak.drkjigsaw.commands.CommandWorld;
-import com.draak.drkjigsaw.player.BlockEvent;
-import com.draak.drkjigsaw.player.JoinEvent;
-import com.draak.drkjigsaw.player.PlayerWrapper;
+import com.draak.drkjigsaw.player.*;
 import com.draak.drkjigsaw.worlds.WorldHandler;
-import com.sun.tools.javac.comp.Check;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -23,10 +17,12 @@ public final class Main extends JavaPlugin {
     public static HashMap<Player, PlayerWrapper> players = new HashMap<>();
     public static World spawnWorld;
 
+    public static int allPlotIDs = 0;
+
 
     public CodeBlocks codeBlocks = new CodeBlocks();
 
-
+    private WorldHandler worldHandler;
 
 
     @Override
@@ -37,10 +33,11 @@ public final class Main extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new JoinEvent(), this);
         getServer().getPluginManager().registerEvents(new BlockEvent(), this);
+        getServer().getPluginManager().registerEvents(new InteractEvent(), this);
+        getServer().getPluginManager().registerEvents(new ClickItemEvent(), this);
 
         CommandHandler.initialize(this);
-
-        WorldHandler.initialize();
+        worldHandler = new WorldHandler();
 
         if (Bukkit.getOnlinePlayers().size() > 0) {
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -69,4 +66,7 @@ public final class Main extends JavaPlugin {
     }
 
 
+    public void updateBufferedWorlds() {
+        worldHandler.updateBufferedWorlds();
+    }
 }

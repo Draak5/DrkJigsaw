@@ -64,6 +64,9 @@ public class CommandWorld implements CommandExecutor {
                 pw.setMode("play");
                 plr.teleport(new Location(world, 5, 50, 5));
             }
+            if (args[0].equalsIgnoreCase("buffer")) {
+                Main.getInstance().updateBufferedWorlds();
+            }
         } else {
             pw.sendError("Invalid Command Format: /world [create/join] <world>");
         }
